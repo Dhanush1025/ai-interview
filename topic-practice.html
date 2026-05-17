@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Practice | AI Virtual Interview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(0, 206, 201, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(20, 21, 26, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo i {
+            color: #00cec9;
+            font-size: 28px;
+        }
+
+        .back-link {
+            color: #a0a0a0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto 80px;
+            padding: 0 20px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Phase 1: Selection Style */
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-section h1 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff 0%, #00cec9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-section p {
+            color: #888;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .topic-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--theme-color, #00cec9);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .topic-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .topic-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: rgba(255,255,255,0.05);
+            color: var(--theme-color);
+        }
+
+        .topic-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .topic-card p {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Phase 2: Active practice UI */
+        .practice-wrapper {
+            display: none;
+            background: rgba(20, 21, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .practice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 20px;
+        }
+
+        .practice-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .practice-title h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 206, 201, 0.15);
+            color: #00cec9;
+        }
+
+        .q-indicator {
+            font-size: 14px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .q-indicator span {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Progress Bar */
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 20%;
+            background: linear-gradient(90deg, #00cec9, #6c5ce7);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        /* Question Box */
+        .question-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .question-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00cec9;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 17px;
+            line-height: 1.6;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        /* Answer Workspace */
+        .answer-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .answer-box {
+            width: 100%;
+            height: 180px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            color: #fff;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .answer-box:focus {
+            border-color: rgba(0, 206, 201, 0.4);
+            box-shadow: 0 0 20px rgba(0, 206, 201, 0.05);
+        }
+
+        .answer-box::placeholder {
+            color: #444;
+        }
+
+        .voice-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(11, 12, 16, 0.9);
+            border-radius: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 5;
+        }
+
+        .voice-overlay.active {
+            display: flex;
+        }
+
+        .pulse-mic {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(253, 121, 168, 0.15);
+            border: 1px solid rgba(253, 121, 168, 0.4);
+            color: #fd79a8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            animation: micPulse 1.5s infinite;
+        }
+
+        @keyframes micPulse {
+            0% { box-shadow: 0 0 0 0 rgba(253, 121, 168, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(253, 121, 168, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(253, 121, 168, 0); }
+        }
+
+        .voice-wave {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            height: 25px;
+            margin-top: 5px;
+        }
+
+        .voice-wave span {
+            width: 3px;
+            height: 8px;
+            background: #fd79a8;
+            border-radius: 10px;
+            animation: bounceWave 1.2s infinite ease-in-out;
+        }
+
+        .voice-wave span:nth-child(2) { animation-delay: 0.15s; }
+        .voice-wave span:nth-child(3) { animation-delay: 0.3s; }
+        .voice-wave span:nth-child(4) { animation-delay: 0.45s; }
+
+        @keyframes bounceWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(3.2); }
+        }
+
+        /* Action Buttons */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #aaa;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: #00cec9;
+            color: #111;
+        }
+
+        .btn-primary:hover {
+            background: #01b4af;
+            box-shadow: 0 0 25px rgba(0, 206, 201, 0.25);
+        }
+
+        .btn-primary:disabled, .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-voice {
+            background: rgba(108, 92, 231, 0.15);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            color: #a29bfe;
+        }
+
+        .btn-voice:hover {
+            background: rgba(108, 92, 231, 0.25);
+            color: #fff;
+        }
+
+        /* AI Feedback Overlay */
+        .feedback-box {
+            display: none;
+            background: rgba(0, 206, 201, 0.04);
+            border: 1px solid rgba(0, 206, 201, 0.15);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+            animation: slideUp 0.4s ease;
+        }
+
+        .feedback-box.active {
+            display: block;
+        }
+
+        .fb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .fb-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #00cec9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fb-score {
+            font-size: 22px;
+            font-weight: 800;
+            color: #00cec9;
+            background: rgba(0, 206, 201, 0.1);
+            padding: 4px 14px;
+            border-radius: 12px;
+        }
+
+        .fb-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        /* Phase 3: Completion UI */
+        .completion-wrapper {
+            display: none;
+            text-align: center;
+            background: rgba(20, 21, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 50px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .confetti-icon {
+            font-size: 55px;
+            color: #fdcb6e;
+            margin-bottom: 20px;
+            animation: rotateIcon 1s ease-out;
+        }
+
+        @keyframes rotateIcon {
+            0% { transform: scale(0.3) rotate(-45deg); }
+            70% { transform: scale(1.2) rotate(15deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .completion-wrapper h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .completion-wrapper p {
+            color: #888;
+            font-size: 15px;
+            margin-bottom: 35px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px 30px;
+            min-width: 140px;
+        }
+
+        .stat-num {
+            font-size: 32px;
+            font-weight: 800;
+            color: #00cec9;
+            margin-bottom: 5px;
+        }
+
+        .stat-num.purple {
+            color: #a29bfe;
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .complet-feedback-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: left;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .complet-feedback-box h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .complet-feedback-box p {
+            color: #ccc;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .complet-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        /* Slide animations */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(20,21,26,0.95);
+            border: 1px solid rgba(0, 206, 201, 0.2);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="training.html" class="logo">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Interviewer</span>
+        </a>
+        <a href="training.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Training
+        </a>
+    </nav>
+
+    <!-- Main Workspace -->
+    <div class="container">
+
+        <!-- Phase 1: Topic Selection -->
+        <div id="selection-phase">
+            <div class="header-section">
+                <h1>Topic-Specific Practice</h1>
+                <p>Master specific engineering domains with short, targeted 5-question micro-sessions and get instant AI feedback on each answer.</p>
+            </div>
+
+            <div class="topics-grid">
+                <!-- Data Structures -->
+                <div class="topic-card" style="--theme-color: #00cec9;" onclick="startPractice('dsa', 'Data Structures & Algorithms', 'fa-network-wired')">
+                    <div class="topic-icon">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <h3>Data Structures & Algorithms</h3>
+                    <p>Arrays, Trees, HashMaps, Recursion, Time Complexity (Big O), Sorting, and dynamic programming questions.</p>
+                </div>
+
+                <!-- System Design -->
+                <div class="topic-card" style="--theme-color: #a29bfe;" onclick="startPractice('sys-design', 'System Design', 'fa-sitemap')">
+                    <div class="topic-icon">
+                        <i class="fa-solid fa-sitemap"></i>
+                    </div>
+                    <h3>System Design</h3>
+                    <p>Horizontal/vertical scaling, caching strategies, REST vs GraphQL, CDN, rate limiting, and microservices.</p>
+                </div>
+
+                <!-- React & Frontend -->
+                <div class="topic-card" style="--theme-color: #74b9ff;" onclick="startPractice('frontend', 'Frontend Engineering', 'fa-code')">
+                    <div class="topic-icon">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h3>Frontend Engineering</h3>
+                    <p>Virtual DOM, hooks, React performance, HTML5 semantics, state management, CSS layouts, and event loop.</p>
+                </div>
+
+                <!-- Database & Backend -->
+                <div class="topic-card" style="--theme-color: #ff7675;" onclick="startPractice('backend', 'Backend Engineering', 'fa-server')">
+                    <div class="topic-icon">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <h3>Backend Engineering</h3>
+                    <p>SQL vs NoSQL, indexes, concurrency, node-event loop, REST APIs design patterns, and ACID transactions.</p>
+                </div>
+
+                <!-- Machine Learning & AI -->
+                <div class="topic-card" style="--theme-color: #ffeaa7;" onclick="startPractice('ml', 'Machine Learning & AI', 'fa-brain')">
+                    <div class="topic-icon">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h3>Machine Learning & AI</h3>
+                    <p>Neural networks, loss functions, overfitting vs underfitting, RAG systems, classification, and embeddings.</p>
+                </div>
+
+                <!-- Behavioral & Leadership -->
+                <div class="topic-card" style="--theme-color: #fd79a8;" onclick="startPractice('behavioral', 'Behavioral & Leadership', 'fa-comments')">
+                    <div class="topic-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <h3>Behavioral & Leadership</h3>
+                    <p>Conflict resolution, failure learning curves, prioritisation framework, STAR methodology, and career ambition.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Active Practice Workspace -->
+        <div id="practice-phase" class="practice-wrapper">
+            <div class="practice-header">
+                <div class="practice-title">
+                    <div class="topic-icon" id="active-icon" style="width:38px; height:38px; font-size:16px;">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h2 id="active-topic-name">Topic Name</h2>
+                    <span class="badge">Topic Session</span>
+                </div>
+                <div class="q-indicator">Question <span id="current-q-num">1</span> of <span>5</span></div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <!-- Question display -->
+            <div class="question-container">
+                <div class="question-label"><i class="fa-regular fa-comment-dots"></i> AI Question</div>
+                <div class="question-text" id="question-text">Loading question...</div>
+            </div>
+
+            <!-- Answer display -->
+            <div class="answer-container">
+                <div class="textarea-wrapper">
+                    <textarea class="answer-box" id="answer-box" placeholder="Write your comprehensive answer here..."></textarea>
+                    
+                    <!-- Voice Recording Overlay -->
+                    <div class="voice-overlay" id="voice-overlay">
+                        <div class="pulse-mic"><i class="fa-solid fa-microphone"></i></div>
+                        <div style="font-weight:600; color:#fd79a8;">Speak Now — AI is listening</div>
+                        <div class="voice-wave">
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button Row -->
+                <div class="action-row">
+                    <button class="btn btn-voice" id="voice-btn">
+                        <i class="fa-solid fa-microphone"></i> Speak Answer
+                    </button>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary" id="skip-btn">Skip Question</button>
+                        <button class="btn btn-primary" id="submit-btn">Evaluate Answer <i class="fa-solid fa-circle-check"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluation Feedback Display -->
+            <div class="feedback-box" id="feedback-box">
+                <div class="fb-header">
+                    <div class="fb-title"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assessment</div>
+                    <div class="fb-score" id="feedback-score">7/10</div>
+                </div>
+                <div class="fb-text" id="feedback-text">Loading instant analysis...</div>
+                
+                <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                    <button class="btn btn-primary" id="next-q-btn" style="background:#6c5ce7; color:#fff;">
+                        Next Question <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Completion report -->
+        <div id="completion-phase" class="completion-wrapper">
+            <div class="confetti-icon">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <h2>Session Completed!</h2>
+            <p>You have successfully completed this topic-specific micro-practice module.</p>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-num" id="stat-avg-score">0%</div>
+                    <div class="stat-lbl">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num purple" id="stat-answered">0/5</div>
+                    <div class="stat-lbl">Answered</div>
+                </div>
+            </div>
+
+            <div class="complet-feedback-box">
+                <h4><i class="fa-solid fa-chart-line" style="color:#a29bfe;"></i> AI Session Summary</h4>
+                <p id="session-summary-text">Generating overall performance breakdown...</p>
+            </div>
+
+            <div class="complet-actions">
+                <button class="btn btn-secondary" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right"></i> Practice Again
+                </button>
+                <a href="training.html" class="btn btn-primary" style="text-decoration:none;">
+                    Back to Training Hub <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Component -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-exclamation" style="color:#00cec9;"></i>
+        <span id="toast-text">Toast Message</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="auth-guard.js"></script>
+    <script>
+        const BACKEND = 'http://localhost:8888';
+        
+        let currentTopic = '';
+        let currentTopicName = '';
+        let currentQuestionIndex = 0;
+        const totalQuestions = 5;
+        let sessionScoreTotal = 0;
+        let answeredCount = 0;
+        const sessionHistory = [];
+        
+        // Voice speech synthesis
+        const synth = window.speechSynthesis;
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // TTS voice helper
+        function speakText(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g, ''));
+            const voices = synth.getVoices();
+            utterance.voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+            utterance.rate = 1.0;
+            synth.speak(utterance);
+        }
+
+        // Start Practice
+        async function startPractice(topicId, topicName, iconName) {
+            currentTopic = topicId;
+            currentTopicName = topicName;
+            currentQuestionIndex = 0;
+            sessionScoreTotal = 0;
+            answeredCount = 0;
+            sessionHistory.length = 0;
+
+            // Update UI to show Active Practice phase
+            document.getElementById('selection-phase').style.display = 'none';
+            const practicePhase = document.getElementById('practice-phase');
+            practicePhase.style.display = 'block';
+            
+            document.getElementById('active-topic-name').textContent = topicName;
+            const iconEl = document.getElementById('active-icon');
+            iconEl.innerHTML = `<i class="fa-solid ${iconName}"></i>`;
+            
+            // Set topic specific gradient colors
+            const card = document.querySelector(`.topic-card[onclick*="${topicId}"]`);
+            const themeColor = card ? card.style.getPropertyValue('--theme-color') : '#00cec9';
+            iconEl.style.color = themeColor;
+            
+            loadQuestion();
+        }
+
+        // Load Question from Backend
+        async function loadQuestion() {
+            // Reset question view elements
+            document.getElementById('feedback-box').classList.remove('active');
+            document.getElementById('answer-box').value = '';
+            document.getElementById('answer-box').disabled = false;
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('skip-btn').disabled = false;
+            document.getElementById('voice-btn').disabled = false;
+
+            document.getElementById('current-q-num').textContent = currentQuestionIndex + 1;
+            document.getElementById('progress-fill').style.width = `${((currentQuestionIndex) / totalQuestions) * 100}%`;
+
+            const qTextEl = document.getElementById('question-text');
+            qTextEl.textContent = 'Generating specialized question...';
+
+            try {
+                // Generate next topic question via specialized backend prompting
+                const response = await fetch(`${BACKEND}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        history: sessionHistory,
+                        lastAnswer: currentQuestionIndex === 0 ? '' : '[Skipped]',
+                        role: `Expert Instructor in ${currentTopicName}`,
+                        company: 'Specialized Practice Lab',
+                        skills: currentTopicName,
+                        interviewType: 'technical-drill'
+                    })
+                });
+
+                if (!response.ok) throw new Error('Generation error');
+                const data = await response.json();
+                
+                const questionText = data.nextQuestion || 'Describe your understanding of this topic.';
+                qTextEl.textContent = questionText;
+                
+                speakText(questionText);
+
+                // Initialize history slot
+                sessionHistory.push({ question: questionText, answer: '' });
+
+            } catch (err) {
+                console.error(err);
+                const fallbackQ = getFallbackTopicQuestion(currentTopic, currentQuestionIndex);
+                qTextEl.textContent = fallbackQ;
+                speakText(fallbackQ);
+                sessionHistory.push({ question: fallbackQ, answer: '' });
+            }
+        }
+
+        // Submit Answer & Evaluate via AI grading
+        document.getElementById('submit-btn').addEventListener('click', async () => {
+            const answer = document.getElementById('answer-box').value.trim();
+            if (!answer) {
+                showToast('Please type your answer or use Speak button!');
+                return;
+            }
+
+            if (synth.speaking) synth.cancel();
+
+            // UI feedback lock
+            document.getElementById('answer-box').disabled = true;
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('skip-btn').disabled = true;
+            document.getElementById('voice-btn').disabled = true;
+
+            const scoreBtn = document.getElementById('submit-btn');
+            const originalText = scoreBtn.innerHTML;
+            scoreBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Grading...';
+
+            try {
+                const question = sessionHistory[currentQuestionIndex].question;
+                sessionHistory[currentQuestionIndex].answer = answer;
+
+                // Call /api/chat with score extraction query
+                const response = await fetch(`${BACKEND}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        history: [],
+                        lastAnswer: `Evaluate this answer to the question: "${question}"\nCandidate Answer: "${answer}"\nGive a score (1-10) and brief comments.\nFormat: [SCORE] X/10 [FEEDBACK] text`,
+                        role: 'Topic Specialist Grader',
+                        company: 'Drill Grading Studio'
+                    })
+                });
+
+                if (!response.ok) throw new Error('Grading error');
+                const data = await response.json();
+                const evalText = data.nextQuestion || data.feedback || '';
+
+                let scoreVal = 7;
+                let feedbackText = evalText;
+
+                if (evalText.includes('[SCORE]') && evalText.includes('[FEEDBACK]')) {
+                    const parts = evalText.split('[FEEDBACK]');
+                    const rawScore = parts[0].replace('[SCORE]', '').trim();
+                    scoreVal = parseInt(rawScore.split('/')[0]) || 7;
+                    feedbackText = parts[1].trim();
+                }
+
+                sessionScoreTotal += scoreVal;
+                answeredCount++;
+
+                // Display Instant assessment feedback box
+                document.getElementById('feedback-score').textContent = `${scoreVal}/10`;
+                document.getElementById('feedback-text').textContent = feedbackText;
+                document.getElementById('feedback-box').classList.add('active');
+
+                speakText(`You scored ${scoreVal} out of 10. ${feedbackText}`);
+
+            } catch (err) {
+                console.error(err);
+                sessionScoreTotal += 7; // Average fallback
+                answeredCount++;
+                document.getElementById('feedback-score').textContent = '7/10';
+                document.getElementById('feedback-text').textContent = 'Good answer! Excellent attempt at describing the core technical features.';
+                document.getElementById('feedback-box').classList.add('active');
+            } finally {
+                scoreBtn.innerHTML = originalText;
+            }
+        });
+
+        // Skip Question
+        document.getElementById('skip-btn').addEventListener('click', () => {
+            if (synth.speaking) synth.cancel();
+            sessionHistory[currentQuestionIndex].answer = '[Skipped]';
+            nextQuestion();
+        });
+
+        // Next Question step
+        document.getElementById('next-q-btn').addEventListener('click', () => {
+            nextQuestion();
+        });
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < totalQuestions) {
+                loadQuestion();
+            } else {
+                finishSession();
+            }
+        }
+
+        // Finish Practice Session and generate completion report
+        async function finishSession() {
+            document.getElementById('practice-phase').style.display = 'none';
+            document.getElementById('completion-phase').style.display = 'block';
+
+            const avgScore = answeredCount > 0 ? Math.round((sessionScoreTotal / (answeredCount * 10)) * 100) : 0;
+            
+            document.getElementById('stat-avg-score').textContent = `${avgScore}%`;
+            document.getElementById('stat-answered').textContent = `${answeredCount}/${totalQuestions}`;
+
+            // Save report session to Supabase if authenticated
+            if (window.supabaseClient && window.currentUser) {
+                try {
+                    await window.supabaseClient.from('interview_sessions').insert({
+                        user_id: window.currentUser.id,
+                        interview_type: 'topic-practice',
+                        difficulty: 'intermediate',
+                        company: `Topic Practice: ${currentTopicName}`,
+                        total_questions: totalQuestions,
+                        answered: answeredCount,
+                        skipped: totalQuestions - answeredCount,
+                        score: avgScore,
+                        duration_seconds: 120, // Estimated drill speed
+                        conversation: sessionHistory,
+                        ai_overall_feedback: `Completed targeted training drill in ${currentTopicName} with average competence score of ${avgScore}%.`,
+                        status: 'completed'
+                    });
+                } catch (e) {
+                    console.error('Supabase save error:', e);
+                }
+            }
+
+            // Load brief session recap breakdown from AI
+            const summaryTextEl = document.getElementById('session-summary-text');
+            summaryTextEl.textContent = 'Generating final performance report...';
+
+            try {
+                const response = await fetch(`${BACKEND}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        history: [],
+                        lastAnswer: `Write a short 2-sentence summary of candidate score ${avgScore}% on specialized technical questions of ${currentTopicName}. Focus on recommendations to improve.`,
+                        role: 'Session Analyst',
+                        company: 'Drill Center'
+                    })
+                });
+                const data = await response.json();
+                summaryTextEl.textContent = data.nextQuestion || data.feedback || ' Drill session recorded. Keep practicing to reach 90%+ scores!';
+            } catch {
+                summaryTextEl.textContent = `You completed your practice drill on ${currentTopicName} with a grade of ${avgScore}%. Keep challenging yourself with specialized drills to build muscle memory!`;
+            }
+        }
+
+        // Audio Recording & Groq Whisper Translation setup
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let micStream = null;
+        let isRecording = false;
+
+        async function startDrillRecording() {
+            audioChunks = [];
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(micStream);
+                
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    processAudio(audioBlob);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+
+                // Update UI state
+                document.getElementById('voice-overlay').classList.add('active');
+            } catch (err) {
+                console.error(err);
+                showToast('Unable to access microphone. Please check system permissions.');
+            }
+        }
+
+        function stopDrillRecording() {
+            if (!isRecording) return;
+            isRecording = false;
+
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            if (micStream) {
+                micStream.getTracks().forEach(t => t.stop());
+            }
+
+            // Reset UI state
+            document.getElementById('voice-overlay').classList.remove('active');
+        }
+
+        async function processAudio(audioBlob) {
+            try {
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'audio.webm');
+                formData.append('model', 'whisper-large-v3');
+
+                const transcribeRes = await fetch(`${BACKEND}/api/transcribe`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!transcribeRes.ok) throw new Error('Transcription failed');
+                const data = await transcribeRes.json();
+                const transcriptText = data.text || '';
+
+                if (transcriptText.trim()) {
+                    const box = document.getElementById('answer-box');
+                    box.value = box.value ? box.value + ' ' + transcriptText : transcriptText;
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Voice transcription failed.');
+            }
+        }
+
+        document.getElementById('voice-btn').addEventListener('click', () => {
+            if (synth.speaking) synth.cancel();
+            
+            if (isRecording) {
+                stopDrillRecording();
+            } else {
+                startDrillRecording();
+            }
+        });
+
+        // Fallback static Question bank for Topic drills
+        const FALLBACK_TOPIC_QUESTIONS = {
+            dsa: [
+                "Explain the difference between an Array and a LinkedList, and their time complexities.",
+                "How does a Hash Map handle hash collisions internally?",
+                "What is the difference between Depth First Search (DFS) and Breadth First Search (BFS)?",
+                "Explain Big O notation and write time complexity for standard quicksort algorithm.",
+                "Describe recursion and how stack memory handles recursive functions."
+            ],
+            'sys-design': [
+                "Describe the trade-offs between Vertical Scaling and Horizontal Scaling.",
+                "What is a Content Delivery Network (CDN) and how does caching benefit systems?",
+                "Explain the difference between strong consistency and eventual consistency.",
+                "How does a Rate Limiter prevent DDoS attacks on public server endpoints?",
+                "Design a simple URL shortener service architecture layout."
+            ],
+            frontend: [
+                "Explain the concept of React Virtual DOM and how reconciliation works.",
+                "What is the difference between Virtual DOM and Shadow DOM?",
+                "How do React Hooks handle component state updates asynchronously?",
+                "Explain the event loop model in JS and task vs microtask queues.",
+                "What is CSS flexbox vs grid and their alignment layout use cases?"
+            ],
+            backend: [
+                "What is the difference between SQL and NoSQL databases? When do we select each?",
+                "Explain database indexes and how they optimize search vs insert operations.",
+                "What are the properties of ACID in transaction databases?",
+                "Describe horizontal sharding database architecture strategies.",
+                "What is Node.js single-threaded event loop and why is it fast?"
+            ],
+            ml: [
+                "Explain the difference between Supervised and Unsupervised Learning.",
+                "Describe the concept of Overfitting and how regularization helps prevent it.",
+                "What is a Loss Function in neural network training loops?",
+                "How do Vector Embeddings represent similarity between text datasets?",
+                "Explain what a RAG (Retrieval Augmented Generation) pipeline is."
+            ],
+            behavioral: [
+                "Tell me about a time you worked on a project with vague or changing specifications.",
+                "How do you handle severe disagreements with a peer engineer on architecture design?",
+                "Describe a situation where a software bug you caused reached production. What did you do?",
+                "How do you estimate developer task speed when prioritizing sprint backlogs?",
+                "Tell me about a time you successfully learned and used a brand-new technical framework."
+            ]
+        };
+
+        function getFallbackTopicQuestion(topic, index) {
+            const list = FALLBACK_TOPIC_QUESTIONS[topic] || FALLBACK_TOPIC_QUESTIONS.frontend;
+            return list[index % list.length];
+        }
+    </script>
+</body>
+</html>

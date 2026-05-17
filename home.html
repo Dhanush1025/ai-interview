@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Virtual Interview | Home</title>
+    <link rel="stylesheet" href="home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Interviewer</span>
+        </div>
+        <div class="nav-links">
+            <a href="home.html" class="active">Home</a>
+            <a href="profile.html">Profile</a>
+            <a href="#" id="logout-btn" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="home-container">
+        <header class="home-header">
+            <h1>Welcome to your AI Interview Hub</h1>
+            <p>Select a module below to start preparing for your dream job.</p>
+        </header>
+
+        <div class="modules-grid">
+            
+            <!-- Profile Management Button/Card -->
+            <a href="profile.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(108, 92, 231, 0.2); color: #a29bfe;">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h3>Profile Management</h3>
+                <p>Set up your personal details, education, experience, and upload your resume for AI context.</p>
+                <span class="card-action">Manage Profile <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <!-- Module 2: AI Mock Interview -->
+            <a href="interview.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(0, 206, 201, 0.2); color: #00cec9;">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <h3>Mock Interview</h3>
+                <p>Start a dynamic video or text-based interview with our advanced AI tailored to your profile.</p>
+                <span class="card-action">Start Interview <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <!-- Module: Training Module -->
+            <a href="training.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(108, 92, 231, 0.2); color: #a29bfe;">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <h3>Training Module</h3>
+                <p>Access mock practices, daily challenges, topic-specific tests, and communication training.</p>
+                <span class="card-action">Start Training <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <!-- Module: Interview History -->
+            <a href="history.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(253, 203, 110, 0.2); color: #fdcb6e;">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <h3>Interview History</h3>
+                <p>Review your past performances, track your progress, and download AI reports.</p>
+                <span class="card-action">View History <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="auth-guard.js"></script>
+</body>
+</html>

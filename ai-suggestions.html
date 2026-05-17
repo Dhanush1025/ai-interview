@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Suggestions | AI Virtual Interview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            left: -15%;
+            width: 45%;
+            height: 45%;
+            background: radial-gradient(circle, rgba(253, 203, 110, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            right: -15%;
+            width: 45%;
+            height: 45%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(20, 21, 26, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo i {
+            color: #fdcb6e;
+            font-size: 28px;
+        }
+
+        .back-link {
+            color: #a0a0a0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto 80px;
+            padding: 0 20px;
+            width: 100%;
+            flex: 1;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .header-section h1 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff 0%, #fdcb6e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-section p {
+            color: #aaa;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Grid sections */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 850px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left column: input/survey */
+        .survey-card {
+            background: rgba(20, 21, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .survey-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #ccc;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .checkbox-group::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .checkbox-group::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .check-lbl {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+
+        .check-lbl:hover {
+            color: #fff;
+        }
+
+        .check-lbl input {
+            accent-color: #fdcb6e;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: rgba(253, 203, 110, 0.5);
+        }
+
+        .btn-survey {
+            width: 100%;
+            padding: 13px;
+            background: #fdcb6e;
+            color: #111;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-survey:hover {
+            background: #ffe090;
+            box-shadow: 0 0 20px rgba(253, 203, 110, 0.25);
+        }
+
+        /* Right column: dynamic output plan */
+        .plan-card {
+            background: rgba(20, 21, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            min-height: 480px;
+            position: relative;
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .plan-header i {
+            font-size: 32px;
+            color: #fdcb6e;
+        }
+
+        .plan-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .plan-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #ccc;
+        }
+
+        .plan-content h4 {
+            color: #fdcb6e;
+            font-size: 15px;
+            margin: 20px 0 10px 0;
+            font-weight: 700;
+        }
+
+        .plan-content h4:first-of-type {
+            margin-top: 0;
+        }
+
+        .plan-content p {
+            margin-bottom: 15px;
+        }
+
+        .plan-content ul {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .plan-content li {
+            margin-bottom: 8px;
+        }
+
+        /* Loading wrapper */
+        .loader-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(11, 12, 16, 0.9);
+            border-radius: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .loader-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(253, 203, 110, 0.1);
+            border-top: 4px solid #fdcb6e;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* History status banner */
+        .history-status {
+            background: rgba(0, 206, 201, 0.08);
+            border: 1px solid rgba(0, 206, 201, 0.2);
+            color: #00cec9;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="training.html" class="logo">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>AI Interviewer</span>
+        </a>
+        <a href="training.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Training
+        </a>
+    </nav>
+
+    <!-- Content Wrapper -->
+    <div class="container">
+
+        <div class="header-section">
+            <h1>Personalized AI Suggestions</h1>
+            <p>Obtain customized study roadmaps, curated topic suggestions, and focus areas customized to your interview history performance or preferred targets.</p>
+        </div>
+
+        <!-- History Connection Status -->
+        <div class="history-status" id="history-banner">
+            <i class="fa-solid fa-circle-check"></i>
+            <span id="banner-text">Loading Supabase interview history session metrics...</span>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Left panel: Focus Survey -->
+            <div class="survey-card">
+                <h3><i class="fa-solid fa-sliders"></i> Target Skills Focus</h3>
+                
+                <div class="form-group">
+                    <label>Skill Targets (Select up to 4)</label>
+                    <div class="checkbox-group">
+                        <label class="check-lbl"><input type="checkbox" name="skill" value="Data Structures"> Data Structures & Algorithms</label>
+                        <label class="check-lbl"><input type="checkbox" name="skill" value="React & CSS"> React & Frontend</label>
+                        <label class="check-lbl"><input type="checkbox" name="skill" value="SQL & Databases"> SQL & Databases</label>
+                        <label class="check-lbl"><input type="checkbox" name="skill" value="System Design"> System Design</label>
+                        <label class="check-lbl"><input type="checkbox" name="skill" value="REST & APIs"> APIs & REST design</label>
+                        <label class="check-lbl"><input type="checkbox" name="skill" value="Behavioral"> HR & Behavioral</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Level</label>
+                    <select class="form-control" id="level-select" style="background:#000; cursor:pointer;">
+                        <option value="Entry Level">Beginner / Entry Level</option>
+                        <option value="Mid-Level" selected>Intermediate / Mid-Level</option>
+                        <option value="Senior Level">Senior / Tech Lead</option>
+                    </select>
+                </div>
+
+                <button class="btn-survey" id="generate-btn">
+                    Generate Roadmap <i class="fa-solid fa-bolt"></i>
+                </button>
+            </div>
+
+            <!-- Right panel: Plan Display -->
+            <div class="plan-card">
+                
+                <!-- Loading Screen -->
+                <div class="loader-overlay" id="plan-loader">
+                    <div class="spinner"></div>
+                    <div style="font-weight:600; color:#fdcb6e;">AI is analyzing your performance metrics...</div>
+                </div>
+
+                <div class="plan-header">
+                    <i class="fa-solid fa-route"></i>
+                    <div>
+                        <h2>Personalized Learning Plan</h2>
+                        <div style="font-size:12px; color:#888; margin-top:2px;" id="plan-date">Generated just now</div>
+                    </div>
+                </div>
+
+                <div class="plan-content" id="plan-container">
+                    <h4><i class="fa-solid fa-circle-play" style="margin-right:8px;"></i> Welcome to your custom roadmap</h4>
+                    <p>We analyze your past session performance scores stored in Supabase to give custom roadmap suggestions. You can also customize your skill focus parameters on the left to recalculate your specific targeted practice modules.</p>
+                    <p>Select your desired options and hit <strong>Generate Roadmap</strong> to get a targeted professional learning path.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="auth-guard.js"></script>
+    <script>
+        const BACKEND = 'http://localhost:8888';
+
+        // Load performance from Supabase
+        async function fetchInterviewHistory() {
+            const banner = document.getElementById('banner-text');
+            const bannerEl = document.getElementById('history-banner');
+
+            if (!window.supabaseClient || !window.currentUser) {
+                banner.textContent = 'Operating in Guest Mode. Connect an account to sync live performance history.';
+                bannerEl.style.backgroundColor = 'rgba(253, 203, 110, 0.08)';
+                bannerEl.style.borderColor = 'rgba(253, 203, 110, 0.2)';
+                bannerEl.style.color = '#fdcb6e';
+                return null;
+            }
+
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('interview_sessions')
+                    .select('interview_type, score, created_at')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    banner.textContent = 'No past sessions recorded. Complete your first Mock Practice to activate performance-based plans.';
+                    bannerEl.style.backgroundColor = 'rgba(253, 203, 110, 0.08)';
+                    bannerEl.style.borderColor = 'rgba(253, 203, 110, 0.2)';
+                    bannerEl.style.color = '#fdcb6e';
+                    return null;
+                }
+
+                const avgScore = Math.round(data.reduce((sum, s) => sum + s.score, 0) / data.length);
+                banner.textContent = `Connected with Supabase history! Analyzed ${data.length} past mock session results. Average Performance Competence: ${avgScore}%`;
+                return data;
+            } catch (e) {
+                console.error(e);
+                banner.textContent = 'Unable to fetch Supabase history. Standard plans active.';
+                return null;
+            }
+        }
+
+        // Generate Plan Action
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const loader = document.getElementById('plan-loader');
+            loader.classList.add('active');
+
+            // Gather skill focus checkboxes
+            const selectedSkills = [];
+            document.querySelectorAll('input[name="skill"]:checked').forEach(c => {
+                selectedSkills.push(c.value);
+            });
+
+            const level = document.getElementById('level-select').value;
+
+            // Generate history string
+            const history = await fetchInterviewHistory();
+            let historyText = 'No past session record.';
+            if (history) {
+                historyText = history.map(h => `${h.interview_type} (Score: ${h.score}%)`).slice(0, 5).join(', ');
+            }
+
+            try {
+                // Call chat backend to format roadmap output
+                const response = await fetch(`${BACKEND}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        history: [],
+                        lastAnswer: `Based on the following candidate information, generate a highly detailed personalized learning and interview prep plan.
+Level: ${level}
+Target Skills: ${selectedSkills.join(', ') || 'General Engineering'}
+Past Session History Performance: ${historyText}
+
+Format the response beautifully as standard HTML markup containing 4 key sections:
+1. <h4>🎯 Primary Target Areas</h4> list of the core concepts they need to master based on target level
+2. <h4>📚 Curated Learning Curriculums</h4> concrete recommended step-by-step topics
+3. <h4>🔥 Custom Dynamic Exercises</h4> 2 sample micro-interview challenge questions for them to try
+4. <h4>🚀 Performance Recommendation</h4> 2 concrete tips to balance their metrics.
+Output ONLY the clean HTML tags. Do not wrap in backticks or markdown formats.`,
+                        role: 'Personal Mentor & Coach',
+                        company: 'Strategic Training Office'
+                    })
+                });
+
+                if (!response.ok) throw new Error('Plan generation failed');
+                const data = await response.json();
+                
+                let htmlPlan = data.nextQuestion || data.feedback || '';
+                // Clean any accidental markdown code fences
+                htmlPlan = htmlPlan.replace(/```html/g, '').replace(/```/g, '').trim();
+
+                document.getElementById('plan-container').innerHTML = htmlPlan;
+                document.getElementById('plan-date').textContent = `Generated just now for ${level}`;
+
+            } catch (err) {
+                console.error(err);
+                // Fallback static roadmap
+                document.getElementById('plan-container').innerHTML = `
+                    <h4>🎯 Primary Target Areas</h4>
+                    <ul>
+                        <li><strong>System Architecture:</strong> Balance modular components, horizontal sharding layers, and caching nodes.</li>
+                        <li><strong>Frontend projection:</strong> Understand event loop schedules and structural React hooks lifecycle metrics.</li>
+                    </ul>
+                    <h4>📚 Curated Learning Curriculums</h4>
+                    <ul>
+                        <li>Read and practice standard ACID relational database sharding strategies.</li>
+                        <li>Engage with topic-specific technical mock practice drills.</li>
+                    </ul>
+                    <h4>🔥 Custom Dynamic Exercises</h4>
+                    <p><em>Try this:</em> Explain standard debounce and throttle implementations in pure Javascript and describe key time differences.</p>
+                `;
+            } finally {
+                loader.classList.remove('active');
+            }
+        });
+
+        // Initialize history check on load
+        setTimeout(fetchInterviewHistory, 500);
+    </script>
+</body>
+</html>

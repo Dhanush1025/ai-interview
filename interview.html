@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Setup | AI Virtual Interview</title>
+    <link rel="stylesheet" href="interview.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Interviewer</span>
+        </div>
+        <a href="home.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <main class="setup-container">
+        <header class="setup-header">
+            <h1>Configure Mock Interview</h1>
+            <p>Customize the AI to match your specific interview scenario</p>
+        </header>
+
+        <form class="setup-form" id="setup-form">
+            
+            <!-- Company & Role -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Target Company</label>
+                    <div class="select-wrapper">
+                        <select class="form-control" required>
+                            <option value="" disabled selected>Select a company</option>
+                            <option value="google">Google</option>
+                            <option value="amazon">Amazon</option>
+                            <option value="microsoft">Microsoft</option>
+                            <option value="meta">Meta</option>
+                            <option value="startup">Generic Startup</option>
+                            <option value="other">Other / General</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Role</label>
+                    <div class="select-wrapper">
+                        <select class="form-control" required>
+                            <option value="" disabled selected>Select a role</option>
+                            <option value="sde">Software Engineer</option>
+                            <option value="data">Data Scientist</option>
+                            <option value="product">Product Manager</option>
+                            <option value="design">UI/UX Designer</option>
+                            <option value="marketing">Marketing Specialist</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domain -->
+            <div class="form-group">
+                <label>Technical Domain / Specialty</label>
+                <div class="select-wrapper">
+                    <select class="form-control" required>
+                        <option value="" disabled selected>Select your domain</option>
+                        <option value="frontend">Frontend (React, Vue, Angular)</option>
+                        <option value="backend">Backend (Node, Java, Python, Go)</option>
+                        <option value="fullstack">Fullstack Development</option>
+                        <option value="ml">Machine Learning / AI</option>
+                        <option value="cloud">Cloud / DevOps</option>
+                        <option value="none">Not Applicable</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Difficulty Level -->
+            <div class="form-group">
+                <label>Difficulty Level</label>
+                <div class="options-grid">
+                    <label class="option-label">
+                        <input type="radio" name="difficulty" value="beginner" required>
+                        <div class="option-card">
+                            <i class="fa-solid fa-seedling"></i>
+                            <span>Beginner</span>
+                        </div>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="difficulty" value="intermediate">
+                        <div class="option-card">
+                            <i class="fa-solid fa-code"></i>
+                            <span>Intermediate</span>
+                        </div>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="difficulty" value="advanced">
+                        <div class="option-card">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>Advanced</span>
+                        </div>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="difficulty" value="expert">
+                        <div class="option-card">
+                            <i class="fa-solid fa-brain"></i>
+                            <span>Expert</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Interview Type -->
+            <div class="form-group">
+                <label>Interview Type</label>
+                <div class="options-grid">
+                    <label class="option-label">
+                        <input type="radio" name="type" value="technical" required>
+                        <div class="option-card">
+                            <i class="fa-solid fa-laptop-code"></i>
+                            <span>Technical</span>
+                        </div>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="type" value="behavioral">
+                        <div class="option-card">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Behavioral</span>
+                        </div>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="type" value="system">
+                        <div class="option-card">
+                            <i class="fa-solid fa-network-wired"></i>
+                            <span>System Design</span>
+                        </div>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="type" value="hr">
+                        <div class="option-card">
+                            <i class="fa-solid fa-handshake"></i>
+                            <span>HR / Cultural</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Launch AI Interview <i class="fa-solid fa-rocket"></i>
+            </button>
+
+        </form>
+    </main>
+    <script>
+        document.getElementById('setup-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.querySelector('input[name="type"]:checked')?.value || 'behavioral';
+            const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value || 'intermediate';
+            const company = document.querySelectorAll('select')[0]?.value || 'general';
+            
+            let url = `interview-room.html?type=${type}&difficulty=${difficulty}&company=${company}`;
+            
+            // Pass profile context if available
+            if (window.currentUser && window.currentUser.profile) {
+                const role = window.currentUser.profile.target_role || '';
+                const skills = window.currentUser.profile.skills || '';
+                if (role) url += `&role=${encodeURIComponent(role)}`;
+                if (skills) url += `&skills=${encodeURIComponent(skills)}`;
+            }
+            
+            window.location.href = url;
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="auth-guard.js"></script>
+</body>
+</html>

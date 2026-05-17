@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview History | AI Virtual Interview</title>
+    <link rel="stylesheet" href="home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Interviewer</span>
+        </div>
+        <a href="home.html" style="color: #a0a0a0; text-decoration: none; font-weight: 500; font-size: 15px; transition: 0.3s; display: flex; align-items: center; gap: 8px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a0a0a0'">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <main class="home-container">
+        <header class="home-header">
+            <h1>Interview History</h1>
+            <p>Review your past performances, track your progress, and download detailed AI reports.</p>
+        </header>
+
+        <div id="history-list" style="margin-top: 30px; max-width: 900px; margin-left: auto; margin-right: auto;">
+            <!-- History cards injected here by history.js -->
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="auth-guard.js"></script>
+    <script src="history.js"></script>
+</body>
+</html>

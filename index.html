@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Premium dark mode login and sign up landing page">
+    <title>Stellar | Authenticate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Skip to Site Button -->
+    <a href="home.html" class="guest-btn">
+        Continue as Guest <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
+    <!-- Animated Background Shapes -->
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+
+    <div class="container" id="container">
+        
+        <!-- Login Form -->
+        <div class="form-box login-box">
+            <h2>Welcome Back</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder="Email Address" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="forgot-pass">
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Sign In</button>
+                
+                <div class="social-login">
+                    <p>Or continue with</p>
+                    <div class="social-icons">
+                        <a href="#" class="google" id="google-login-btn"><i class="fa-brands fa-google"></i></a>
+                        <a href="#" class="github"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    <p style="color: #a0a0a0; font-size: 14px;">Are you hiring?</p>
+                    <a href="company-dashboard.html" style="color: #00cec9; text-decoration: none; font-weight: 600; font-size: 15px; margin-top: 5px; display: inline-block;">Enter Company Portal <i class="fa-solid fa-arrow-right" style="font-size: 12px; margin-left: 5px;"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-box register-box">
+            <h2>Create Account</h2>
+            <form id="register-form">
+                <div class="input-group">
+                    <input type="text" id="register-name" placeholder="Full Name" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="register-email" placeholder="Email Address" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="register-password" placeholder="Password" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn">Sign Up</button>
+                
+                <div class="social-login">
+                    <p>Or register with</p>
+                    <div class="social-icons">
+                        <a href="#" class="google" id="google-register-btn"><i class="fa-brands fa-google"></i></a>
+                        <a href="#" class="github"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sliding Overlay Panel -->
+        <div class="toggle-box">
+            <div class="toggle-panel">
+                
+                <!-- Overlay content for Login mode (shows on left when active) -->
+                <div class="toggle-inner toggle-left">
+                    <h2>Hello, Friend!</h2>
+                    <p>Already have an account? Sign in to access your dashboard and continue your journey.</p>
+                    <button type="button" class="btn btn-transparent" id="loginBtn">Sign In</button>
+                </div>
+
+                <!-- Overlay content for Register mode (shows on right by default) -->
+                <div class="toggle-inner toggle-right">
+                    <h2>New Here?</h2>
+                    <p>Sign up today and discover a world of possibilities. Join our community now!</p>
+                    <button type="button" class="btn btn-transparent" id="registerBtn">Sign Up</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

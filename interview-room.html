@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Interview | AI Virtual Interview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #0b0c10; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Navbar */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 25px; background: rgba(15,16,21,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 100;
+        }
+        .logo { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: #00cec9; }
+        .nav-center { display: flex; align-items: center; gap: 25px; }
+        .timer {
+            font-size: 20px; font-weight: 700; color: #00cec9;
+            background: rgba(0,206,201,0.08); padding: 6px 18px;
+            border-radius: 20px; border: 1px solid rgba(0,206,201,0.2);
+            font-variant-numeric: tabular-nums; letter-spacing: 1px;
+        }
+        .q-counter { font-size: 13px; color: #aaa; }
+        .q-counter span { color: #fff; font-weight: 600; }
+        .end-btn {
+            background: rgba(255,118,117,0.12); color: #ff7675;
+            border: 1px solid rgba(255,118,117,0.3); padding: 8px 16px;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .end-btn:hover { background: rgba(255,118,117,0.25); }
+
+        /* Workspace */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+
+        /* ===== LEFT: Video Area ===== */
+        .video-area { flex: 1.6; display: flex; flex-direction: column; padding: 16px; gap: 14px; position: relative; min-width: 0; }
+
+        /* AI Panel */
+        .ai-panel {
+            flex: 1; background: #13141a; border-radius: 14px;
+            border: 1px solid rgba(0,206,201,0.15);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+        }
+        .ai-panel::before {
+            content: ''; position: absolute; top: -40%; left: -20%;
+            width: 80%; height: 80%;
+            background: radial-gradient(circle, rgba(0,206,201,0.07) 0%, transparent 70%);
+        }
+        .ai-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, #00cec9, #6c5ce7);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 42px; color: #fff; margin-bottom: 14px;
+            box-shadow: 0 0 25px rgba(0,206,201,0.35);
+        }
+        .ai-avatar.speaking { animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,206,201,0.5); }
+            70% { box-shadow: 0 0 0 22px rgba(0,206,201,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,206,201,0); }
+        }
+        .ai-name { font-size: 16px; font-weight: 600; }
+        .ai-status { font-size: 12px; color: #00cec9; margin-top: 4px; }
+
+        /* Current Question Box */
+        .question-box {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(10,11,16,0.98) 0%, rgba(10,11,16,0.7) 100%);
+            padding: 20px 25px; border-radius: 0 0 14px 14px;
+        }
+        .q-label { font-size: 10px; font-weight: 700; color: #00cec9; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+        .q-text { font-size: 15px; line-height: 1.55; color: #e0e0e0; }
+
+        /* User Cam PiP */
+        .user-cam-pip {
+            position: absolute; bottom: 160px; right: 30px;
+            width: 200px; height: 130px; border-radius: 10px;
+            background: #1a1b22; border: 2px solid rgba(255,255,255,0.1);
+            overflow: hidden; z-index: 20;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+        .user-cam-pip video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .cam-off-placeholder {
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; gap: 6px; color: #555;
+        }
+        .cam-off-placeholder i { font-size: 28px; }
+        .cam-off-placeholder span { font-size: 10px; }
+        .pip-label {
+            position: absolute; bottom: 5px; left: 8px; font-size: 10px;
+            background: rgba(0,0,0,0.65); padding: 2px 7px; border-radius: 4px; color: #ccc;
+        }
+
+        /* Controls Bar */
+        .controls {
+            display: flex; justify-content: center; align-items: center; gap: 14px;
+            padding: 12px 24px; background: rgba(15,16,21,0.9);
+            border-radius: 40px; border: 1px solid rgba(255,255,255,0.06);
+            align-self: center;
+        }
+        .ctrl-btn {
+            width: 46px; height: 46px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.06); color: #ccc;
+            font-size: 16px; cursor: pointer; transition: 0.25s;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .ctrl-btn.active { background: #00cec9; color: #0b0c10; box-shadow: 0 0 14px rgba(0,206,201,0.4); }
+        .ctrl-btn.off { background: rgba(255,118,117,0.15); color: #ff7675; }
+
+        /* ===== RIGHT: Chat & Answer Panel ===== */
+        .right-panel { width: 360px; display: flex; flex-direction: column; background: #0f1015; border-left: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+
+        .panel-header {
+            padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .panel-title { font-size: 14px; font-weight: 600; }
+        .live-badge {
+            background: rgba(253,121,168,0.15); color: #fd79a8;
+            font-size: 10px; padding: 3px 9px; border-radius: 10px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .live-dot { width: 6px; height: 6px; background: #fd79a8; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+        /* Chat Transcript */
+        .chat-box {
+            flex: 1; overflow-y: auto; padding: 18px;
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .chat-box::-webkit-scrollbar { width: 4px; }
+        .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+
+        .msg { max-width: 88%; padding: 12px 15px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+        .msg-ai { background: rgba(0,206,201,0.08); border-left: 3px solid #00cec9; align-self: flex-start; }
+        .msg-user { background: rgba(108,92,231,0.1); border-right: 3px solid #6c5ce7; align-self: flex-end; text-align: right; }
+        .msg-label { font-size: 10px; color: #888; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .typing { display: flex; gap: 4px; align-items: center; padding: 12px 15px; }
+        .typing span { width: 7px; height: 7px; background: #00cec9; border-radius: 50%; animation: bounce 1.2s infinite; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-8px);} }
+
+        /* Answer Input */
+        .answer-area {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 14px;
+        }
+        .answer-label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .answer-input {
+            width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; color: #fff; font-size: 13px; padding: 10px 14px;
+            resize: none; outline: none; min-height: 80px; line-height: 1.5; transition: 0.2s;
+        }
+        .answer-input:focus { border-color: rgba(0,206,201,0.4); background: rgba(255,255,255,0.06); }
+        .answer-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-submit {
+            flex: 1; padding: 10px; background: linear-gradient(135deg, #00cec9, #6c5ce7);
+            border: none; border-radius: 8px; color: #fff; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: 0.25s;
+        }
+        .btn-submit:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-next {
+            padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #aaa; font-size: 13px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-next:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* Score overlay on end */
+        .score-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            z-index: 999; justify-content: center; align-items: center;
+        }
+        .score-overlay.show { display: flex; }
+        .score-card {
+            background: #14151a; border: 1px solid rgba(0,206,201,0.2);
+            border-radius: 20px; padding: 50px 60px; text-align: center;
+            box-shadow: 0 0 60px rgba(0,206,201,0.1);
+        }
+        .score-circle {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: conic-gradient(#00cec9 0%, #6c5ce7 100%);
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 25px; font-size: 34px; font-weight: 800;
+            box-shadow: 0 0 30px rgba(0,206,201,0.3);
+        }
+        .score-card h2 { font-size: 24px; margin-bottom: 10px; }
+        .score-card p { color: #888; margin-bottom: 30px; }
+        .score-actions { display: flex; gap: 15px; justify-content: center; }
+        .btn-home {
+            padding: 12px 28px; background: linear-gradient(135deg, #00cec9, #6c5ce7);
+            border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 600;
+            cursor: pointer; text-decoration: none; display: inline-block;
+        }
+        .btn-retry {
+            padding: 12px 28px; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            color: #fff; font-size: 14px; cursor: pointer;
+        }
+        .btn-voice {
+            padding: 10px 16px; background: rgba(108,92,231,0.15);
+            border: 1px solid rgba(108,92,231,0.4); border-radius: 8px;
+            color: #a29bfe; font-size: 13px; cursor: pointer; transition: 0.25s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-voice:hover { background: rgba(108,92,231,0.3); }
+        .btn-voice.recording {
+            background: rgba(255,118,117,0.2); border-color: #ff7675;
+            color: #ff7675; animation: mic-pulse 1s infinite;
+        }
+        @keyframes mic-pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(255,118,117,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(255,118,117,0); }
+        }
+        .ai-speaking-wave {
+            display: flex; gap: 3px; align-items: center; margin-top: 8px;
+        }
+        .ai-speaking-wave span {
+            display: inline-block; width: 3px; height: 14px;
+            background: #00cec9; border-radius: 3px;
+            animation: wave 1s infinite ease-in-out;
+        }
+        .ai-speaking-wave span:nth-child(2){animation-delay:0.1s;}
+        .ai-speaking-wave span:nth-child(3){animation-delay:0.2s;}
+        .ai-speaking-wave span:nth-child(4){animation-delay:0.3s;}
+        .ai-speaking-wave span:nth-child(5){animation-delay:0.4s;}
+        @keyframes wave {
+            0%,100%{transform:scaleY(0.4);} 50%{transform:scaleY(1.5);}
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI Interview Engine</span>
+    </div>
+    <div class="nav-center">
+        <div class="timer" id="timer">00:00</div>
+        <div class="q-counter">Question <span id="q-num">1</span> / <span id="q-total">5</span></div>
+    </div>
+    <button class="end-btn" id="end-btn"><i class="fa-solid fa-flag-checkered"></i> End Interview</button>
+</nav>
+
+<!-- Workspace -->
+<div class="workspace">
+
+    <!-- Left: Video Area -->
+    <div class="video-area">
+
+        <!-- AI Panel -->
+        <div class="ai-panel">
+            <div class="ai-avatar" id="ai-avatar">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <div class="ai-name">AI Senior Recruiter</div>
+            <div class="ai-status" id="ai-status">Asking question...</div>
+
+            <!-- Question Display -->
+            <div class="question-box">
+                <div class="q-label"><i class="fa-solid fa-circle-question"></i> &nbsp;Current Question</div>
+                <div class="q-text" id="q-text">Loading your first question...</div>
+            </div>
+        </div>
+
+        <!-- User Camera PiP -->
+        <div class="user-cam-pip" id="user-cam-pip">
+            <div class="cam-off-placeholder" id="cam-placeholder">
+                <i class="fa-solid fa-video-slash"></i>
+                <span>Camera Off</span>
+            </div>
+            <video id="user-video" autoplay muted playsinline style="display:none;"></video>
+            <span class="pip-label">You</span>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="ctrl-btn off" id="cam-btn" title="Toggle Camera">
+                <i class="fa-solid fa-video-slash"></i>
+            </button>
+            <button class="ctrl-btn off" id="mic-btn" title="Toggle Microphone">
+                <i class="fa-solid fa-microphone-slash"></i>
+            </button>
+            <button class="ctrl-btn" id="screen-btn" title="Share Screen">
+                <i class="fa-solid fa-desktop"></i>
+            </button>
+            <button class="ctrl-btn" id="settings-btn" title="Settings">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Right: Chat & Answer Panel -->
+    <div class="right-panel">
+        <div class="panel-header">
+            <span class="panel-title">Live Transcript</span>
+            <span class="live-badge"><div class="live-dot"></div> Recording</span>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <div class="msg msg-ai">
+                <div class="msg-label">AI Recruiter</div>
+                Welcome! I'm your AI interviewer today. I'll be asking you <strong>5 questions</strong>. Take your time to answer each one thoughtfully. Let's begin!
+            </div>
+        </div>
+
+        <div class="answer-area">
+            <div class="answer-label"><i class="fa-solid fa-keyboard"></i> &nbsp;Your Answer</div>
+            <textarea class="answer-input" id="answer-input" placeholder="Type your answer or click 🎙 to speak..."></textarea>
+            <div class="answer-btns">
+                <button class="btn-voice" id="voice-btn" title="Speak your answer">
+                    <i class="fa-solid fa-microphone"></i> Speak
+                </button>
+                <button class="btn-submit" id="submit-answer">Submit <i class="fa-solid fa-paper-plane"></i></button>
+                <button class="btn-next" id="skip-btn">Skip <i class="fa-solid fa-forward"></i></button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Start Overlay -->
+<div class="score-overlay show" id="start-overlay" style="background: rgba(11,12,16,0.95); z-index: 1000;">
+    <div class="score-card">
+        <div class="score-circle" style="background: linear-gradient(135deg, #00cec9, #6c5ce7); font-size: 40px; color: #fff;"><i class="fa-solid fa-play"></i></div>
+        <h2>Ready to Begin?</h2>
+        <p>Ensure your microphone and camera are ready.</p>
+        <button class="btn-home" id="begin-btn" style="margin-top: 20px;"><i class="fa-solid fa-rocket"></i> Start Interview</button>
+    </div>
+</div>
+
+<!-- Score Overlay -->
+<div class="score-overlay" id="score-overlay">
+    <div class="score-card">
+        <div class="score-circle" id="score-circle">78%</div>
+        <h2>Interview Complete!</h2>
+        <p>You answered all 5 questions. Here's your performance summary.</p>
+        <div class="answer-btns" style="margin-bottom: 20px; justify-content: center;">
+            <div style="text-align:center; padding: 10px 20px; background: rgba(0,206,201,0.1); border-radius: 10px; border: 1px solid rgba(0,206,201,0.2);">
+                <div style="font-size: 22px; font-weight: 700; color: #00cec9;" id="answered-count">5</div>
+                <div style="font-size: 11px; color: #888; margin-top: 4px;">Answered</div>
+            </div>
+            <div style="text-align:center; padding: 10px 20px; background: rgba(108,92,231,0.1); border-radius: 10px; border: 1px solid rgba(108,92,231,0.2);">
+                <div style="font-size: 22px; font-weight: 700; color: #a29bfe;" id="skipped-count">0</div>
+                <div style="font-size: 11px; color: #888; margin-top: 4px;">Skipped</div>
+            </div>
+        </div>
+        <div class="score-actions">
+            <a href="home.html" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
+            <button class="btn-retry" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — all AI calls go through backend (no exposed key)
+// ============================================================
+const BACKEND = 'http://localhost:8888';
+
+const params = new URLSearchParams(window.location.search);
+const interviewType = params.get('type') || 'behavioral';
+const difficulty    = params.get('difficulty') || 'intermediate';
+const company       = params.get('company') || 'a top tech company';
+const role          = params.get('role') || 'candidate';
+const skills        = params.get('skills') || '';
+
+const TOTAL_QUESTIONS = 100; // Virtually unlimited for the session
+let currentQ    = 0;
+let answered    = 0;
+let skipped     = 0;
+let timerSec    = 0;
+let timerInterval;
+const conversationHistory = [];
+
+const qText     = document.getElementById('q-text');
+const qNum      = document.getElementById('q-num');
+const qTotal    = document.getElementById('q-total');
+if (qTotal) qTotal.parentElement.style.display = 'none';
+const chatBox   = document.getElementById('chat-box');
+const answerInput = document.getElementById('answer-input');
+const aiAvatar  = document.getElementById('ai-avatar');
+const aiStatus  = document.getElementById('ai-status');
+const timerEl   = document.getElementById('timer');
+
+qTotal.textContent = TOTAL_QUESTIONS;
+
+// ---- Timer ----
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timerSec++;
+        const m = String(Math.floor(timerSec / 60)).padStart(2, '0');
+        const s = String(timerSec % 60).padStart(2, '0');
+        timerEl.textContent = `${m}:${s}`;
+    }, 1000);
+}
+
+// ---- Chat helpers ----
+function addMsg(role, text) {
+    const div = document.createElement('div');
+    div.className = `msg ${role === 'ai' ? 'msg-ai' : 'msg-user'}`;
+    div.innerHTML = `<div class="msg-label">${role === 'ai' ? 'AI Recruiter' : 'You'}</div>${text}`;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function showTyping() {
+    const t = document.createElement('div');
+    t.className = 'msg msg-ai';
+    t.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+    chatBox.appendChild(t);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return t;
+}
+
+// ---- Fallback Question Bank (used when API quota exceeded) ----
+const FALLBACK_QUESTIONS = {
+    technical: {
+        beginner:     ["What is the difference between HTML, CSS, and JavaScript?","What is a variable and why do we use it?","Explain what an API is in simple terms.","What is the difference between == and === in JavaScript?","What does responsive design mean?"],
+        intermediate: ["Explain REST vs GraphQL. When would you choose one?","What is time complexity? Give O(n) vs O(n²) examples.","How does a hash map work internally?","Explain async/await vs Promises in JavaScript.","What is the difference between SQL and NoSQL?"],
+        advanced:     ["Design a rate limiter for a public API.","How would you optimize a slow SQL query with millions of rows?","Explain CAP theorem and its implications.","How would you handle distributed transactions in microservices?","What is event sourcing and when would you use it?"],
+        expert:       ["Design a globally distributed database like Google Spanner.","How would you architect a real-time collaborative document editor?","Explain the tradeoffs between strong and eventual consistency.","How do you build a fault-tolerant system at 99.999% uptime?","Design a search engine ranking system."]
+    },
+    behavioral: {
+        beginner:     ["Tell me about yourself.","What are your greatest strengths?","Why do you want this job?","Describe your ideal work environment.","Where do you see yourself in 5 years?"],
+        intermediate: ["Tell me about a challenging project you completed.","Describe a time you had a conflict with a colleague. How did you resolve it?","Give an example of when you went above and beyond at work.","How do you prioritize tasks when everything is urgent?","Tell me about a time you failed and what you learned."],
+        advanced:     ["Describe a time you influenced a major technical decision.","Tell me about leading a team through a critical production incident.","How have you driven cross-functional collaboration on a complex project?","Describe a situation where you had to make a decision with incomplete data.","Tell me about a time you pushed back on an unrealistic deadline."],
+        expert:       ["How have you built and scaled engineering teams?","Describe how you established engineering culture in a fast-growing org.","Tell me about a time you made a $1M+ business impact through technical leadership.","How do you balance technical debt vs. feature velocity at scale?","Describe your approach to hiring 10x engineers."]
+    },
+    hr: {
+        beginner:     ["Tell me about yourself.","What motivates you at work?","How do you handle stress?","What are your career goals?","Why are you leaving your current job?"],
+        intermediate: ["How do you handle disagreements with your manager?","Describe your ideal work-life balance.","How do you stay updated in your field?","What do you know about our company?","What salary range are you expecting?"],
+        advanced:     ["How do you define professional success?","Describe your leadership philosophy.","How do you build trust with stakeholders?","What would you do in your first 90 days here?","How do you manage underperforming team members?"],
+        expert:       ["How do you drive organizational change?","What's your approach to building a high-performance culture?","How do you align engineering roadmap with business strategy?","Describe your executive communication style.","How do you mentor future leaders?"]
+    },
+    system: {
+        beginner:     ["What is a client-server architecture?","What is caching and why is it used?","Explain the difference between vertical and horizontal scaling.","What is a load balancer?","What is a CDN and when would you use it?"],
+        intermediate: ["Design a URL shortener like bit.ly.","How would you design a notification system?","Design a simple key-value store.","How would you build a basic recommendation engine?","Design a file storage system like Dropbox."],
+        advanced:     ["Design Twitter's tweet feed at scale.","How would you build a real-time chat system for 10M users?","Design YouTube's video upload and streaming pipeline.","How would you architect a ride-sharing service like Uber?","Design a distributed job scheduler."],
+        expert:       ["Design Google's web crawler at planetary scale.","Architect a global payment processing system.","Design a multi-region active-active database replication system.","How would you build a real-time fraud detection system?","Design the infrastructure for a self-driving car data pipeline."]
+    }
+};
+
+function getFallbackQuestion(index) {
+    const bank = FALLBACK_QUESTIONS[interviewType]?.[difficulty] || FALLBACK_QUESTIONS.behavioral.intermediate;
+    return bank[index % bank.length];
+}
+
+// ---- Proxy: call backend chat (no API key in client) ----
+async function backendChat(payload) {
+    const res = await fetch(`${BACKEND}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Backend unreachable');
+    return res.json();
+}
+
+// ---- Generate initial question ----
+async function generateInitialQuestion() {
+    stopListening();
+    aiStatus.textContent = 'Preparing interview...';
+    const typing = showTyping();
+    try {
+        const data = await backendChat({ history: [], lastAnswer: '', interviewType, company, role, skills });
+        typing.remove();
+        const question = data.nextQuestion || getFallbackQuestion(0);
+        qText.textContent = question;
+        addMsg('ai', question);
+        conversationHistory.push({ question, answer: '' });
+        answerInput.disabled = false;
+        answerInput.focus();
+        speakText(question, true);
+    } catch (err) {
+        typing.remove();
+        console.warn('Backend unavailable, using fallback:', err.message);
+        const fallback = getFallbackQuestion(0);
+        qText.textContent = fallback;
+        addMsg('ai', fallback);
+        conversationHistory.push({ question: fallback, answer: '' });
+        answerInput.disabled = false;
+        speakText(fallback, true);
+    }
+}
+
+// ---- Generate next question (for Skip) ----
+async function generateQuestion(index) {
+    const typing = showTyping();
+    answerInput.disabled = true;
+    try {
+        const data = await backendChat({ history: conversationHistory, lastAnswer: '[Skipped]', interviewType, company, role, skills });
+        typing.remove();
+        const question = data.nextQuestion || getFallbackQuestion(index);
+        qText.textContent = question;
+        addMsg('ai', question);
+        conversationHistory.push({ question, answer: '' });
+    } catch {
+        typing.remove();
+        const question = getFallbackQuestion(index);
+        qText.textContent = question;
+        addMsg('ai', question);
+        conversationHistory.push({ question, answer: '' });
+    } finally {
+        answerInput.disabled = false;
+        answerInput.focus();
+        speakText(qText.textContent, true);
+    }
+}
+
+// ---- Submit Answer → Unified Chat API ----
+document.getElementById('submit-answer').addEventListener('click', async () => {
+    const answer = answerInput.value.trim();
+    if (!answer) { answerInput.focus(); return; }
+
+    if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+    stopListening();
+
+    addMsg('user', answer);
+    answered++;
+    if (conversationHistory[currentQ]) conversationHistory[currentQ].answer = answer;
+
+    answerInput.value = '';
+    answerInput.disabled = true;
+    aiAvatar.classList.add('speaking');
+    aiStatus.textContent = 'AI is processing...';
+
+    const typing = showTyping();
+    
+    try {
+        const data = await getChatResponse(conversationHistory, answer);
+        typing.remove();
+
+        const { feedback, nextQuestion } = data;
+
+        // Add feedback and question to chat
+        addMsg('ai', `<em>${feedback}</em><br><br>${nextQuestion}`);
+        
+        currentQ++;
+        qNum.textContent = currentQ + 1;
+        qText.textContent = nextQuestion;
+        conversationHistory.push({ question: nextQuestion, answer: '' });
+
+        answerInput.disabled = false;
+        answerInput.focus();
+
+        // Speak both feedback and next question (Shortened)
+        speakText(`${feedback}. ${nextQuestion}`, true);
+
+    } catch (err) {
+        typing.remove();
+        console.error("Critical Chat Error:", err);
+        addMsg('ai', "System encountered an error. Please try again.");
+        answerInput.disabled = false;
+    }
+    aiAvatar.classList.remove('speaking');
+});
+
+// ---- Get chat response (backend → fallback question bank) ----
+async function getChatResponse(history, answer) {
+    try {
+        return await backendChat({ history, lastAnswer: answer, interviewType, company, role, skills });
+    } catch (err) {
+        console.warn('Backend failed, using fallback Q-bank:', err.message);
+        return {
+            feedback: 'Got it.',
+            nextQuestion: getFallbackQuestion(currentQ + 1)
+        };
+    }
+}
+
+// ---- (speakText defined below with voice overlap fix) ----
+
+// ---- Skip ----
+document.getElementById('skip-btn').addEventListener('click', () => {
+    if (answerInput.disabled) return;
+    skipped++;
+    if (conversationHistory[currentQ]) {
+        conversationHistory[currentQ].answer = '[Skipped]';
+    }
+    addMsg('user', '<em style="color:#888;">[ Skipped ]</em>');
+    currentQ++;
+    setTimeout(() => generateQuestion(currentQ), 600);
+});
+
+// ---- End Interview ----
+async function endInterview() {
+    clearInterval(timerInterval);
+    if (synth.speaking) synth.cancel();
+    stopListening();
+
+    // Show overlay immediately with spinner
+    document.getElementById('score-overlay').classList.add('show');
+    document.getElementById('answered-count').textContent = answered;
+    document.getElementById('skipped-count').textContent = skipped;
+
+    const scoreCircle = document.getElementById('score-circle');
+    const scoreActions = document.querySelector('.score-actions');
+    scoreCircle.textContent = '...';
+    scoreActions.innerHTML = '<div style="color:#00cec9;text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Analyzing performance...</div>';
+
+    // Get AI-based score from backend
+    let aiScore = { overall: 0, technical: 0, communication: 0, problemSolving: 0, summary: '' };
+    try {
+        const res = await fetch(`${BACKEND}/api/score`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversation: conversationHistory, role, interviewType })
+        });
+        aiScore = await res.json();
+    } catch (e) {
+        // Fallback: simple answered-ratio score
+        const total = answered + skipped;
+        aiScore.overall = total > 0 ? Math.round((answered / total) * 10) : 0;
+        aiScore.summary = 'Good effort! Keep practicing to sharpen your skills.';
+    }
+
+    const displayScore = Math.round(aiScore.overall * 10); // 0-100
+    scoreCircle.textContent = displayScore + '%';
+
+    // Save to Supabase
+    if (window.supabaseClient && window.currentUser) {
+        try {
+            await window.supabaseClient.from('interview_sessions').insert({
+                user_id: window.currentUser.id,
+                interview_type: interviewType,
+                difficulty,
+                company,
+                total_questions: answered + skipped,
+                answered,
+                skipped,
+                score: displayScore,
+                duration_seconds: timerSec,
+                conversation: conversationHistory,
+                ai_overall_feedback: aiScore.summary,
+                status: 'completed'
+            });
+        } catch (err) {
+            console.error('Error saving session:', err);
+        }
+    }
+
+    scoreActions.innerHTML = `
+        <a href="home.html" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
+        <button class="btn-retry" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+    `;
+}
+document.getElementById('end-btn').addEventListener('click', endInterview);
+
+// ============================================================
+// CAMERA & MICROPHONE
+// ============================================================
+let camStream = null, micStream = null;
+const camBtn = document.getElementById('cam-btn');
+const micBtn = document.getElementById('mic-btn');
+const userVideo = document.getElementById('user-video');
+const camPlaceholder = document.getElementById('cam-placeholder');
+
+camBtn.addEventListener('click', async () => {
+    if (camStream) {
+        camStream.getTracks().forEach(t => t.stop());
+        camStream = null;
+        userVideo.style.display = 'none';
+        camPlaceholder.style.display = 'flex';
+        camBtn.classList.replace('active','off');
+        camBtn.innerHTML = '<i class="fa-solid fa-video-slash"></i>';
+    } else {
+        try {
+            camStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            userVideo.srcObject = camStream;
+            userVideo.style.display = 'block';
+            camPlaceholder.style.display = 'none';
+            camBtn.classList.replace('off','active');
+            camBtn.innerHTML = '<i class="fa-solid fa-video"></i>';
+        } catch { alert('Camera permission denied.'); }
+    }
+});
+
+micBtn.addEventListener('click', async () => {
+    if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+        micBtn.classList.replace('active','off');
+        micBtn.innerHTML = '<i class="fa-solid fa-microphone-slash"></i>';
+        aiStatus.textContent = 'Mic Off';
+    } else {
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            micBtn.classList.replace('off','active');
+            micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+            aiStatus.textContent = 'Listening...';
+        } catch { alert('Microphone permission denied.'); }
+    }
+});
+
+// ============================================================
+// START
+// ============================================================
+document.getElementById('begin-btn').addEventListener('click', async () => {
+    // Request persistent mic permission right at the start
+    try {
+        if (!micStream) {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const micBtn = document.getElementById('mic-btn');
+            micBtn.classList.replace('off','active');
+            micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+        }
+    } catch(err) {
+        alert("Microphone permission is required for the live voice interview!");
+        return; 
+    }
+
+    document.getElementById('start-overlay').classList.remove('show');
+    startTimer();
+    generateInitialQuestion();
+});
+
+// ============================================================
+// TEXT-TO-SPEECH (AI speaks questions & feedback)
+// ============================================================
+let currentUtterance = null;
+const synth = window.speechSynthesis;
+
+function speakText(text, autoListen = false) {
+    if (synth.speaking) synth.cancel();
+    const clean = text.replace(/<[^>]+>/g, '');
+    const utterance = new SpeechSynthesisUtterance(clean);
+
+    const voices = synth.getVoices();
+    const preferred = voices.find(v =>
+        v.name.includes('Google UK English Female') ||
+        v.name.includes('Samantha') ||
+        v.name.includes('Karen') ||
+        (v.lang === 'en-GB')
+    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+
+    if (preferred) utterance.voice = preferred;
+    utterance.rate = 0.95;
+    utterance.pitch = 1.05;
+    utterance.volume = 1;
+
+    utterance.onstart = () => {
+        aiAvatar.classList.add('speaking');
+        aiStatus.textContent = 'Speaking...';
+        // Stop listening while AI is talking (voice overlap fix)
+        if (isRecording) stopListening();
+    };
+
+    utterance.onend = () => {
+        aiAvatar.classList.remove('speaking');
+        // Only auto-listen after a question (not after feedback mid-flow)
+        if (autoListen && !answerInput.disabled) {
+            setTimeout(() => startListening(), 400);
+        } else {
+            aiStatus.textContent = 'Listening...';
+        }
+    };
+
+    currentUtterance = utterance;
+    synth.speak(utterance);
+}
+
+// Load voices async (Chrome)
+if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = () => synth.getVoices();
+}
+
+// ============================================================
+// AUDIO RECORDING & GROQ WHISPER (True Voice Assistant)
+// ============================================================
+const voiceBtn = document.getElementById('voice-btn');
+let mediaRecorder = null;
+let audioChunks = [];
+let audioContext = null;
+let analyser = null;
+let microphoneSource = null;
+let silenceStart = null;
+let silenceThreshold = 15; // Volume threshold for silence
+let silenceDelay = 2000; // 2 seconds of silence triggers stop
+let isRecording = false;
+let checkSilenceInterval = null;
+
+async function setupAudioRecording() {
+    try {
+        if (!micStream) {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            document.getElementById('mic-btn').classList.replace('off','active');
+            document.getElementById('mic-btn').innerHTML = '<i class="fa-solid fa-microphone"></i>';
+        }
+        
+        // Setup Media Recorder
+        mediaRecorder = new MediaRecorder(micStream);
+        
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+            if (audioChunks.length === 0) return;
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            audioChunks = [];
+            
+            aiStatus.textContent = 'Transcribing your voice...';
+            voiceBtn.classList.remove('recording');
+            voiceBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Speak';
+            
+            try {
+                // Route Whisper through backend (keeps API key server-side)
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'audio.webm');
+                formData.append('model', 'whisper-large-v3');
+
+                const res = await fetch(`${BACKEND}/api/transcribe`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (data.text && data.text.trim().length > 0) {
+                    answerInput.value = data.text;
+                    document.getElementById('submit-answer').click();
+                } else {
+                    aiStatus.textContent = 'Could not hear you. Try again.';
+                }
+            } catch (err) {
+                console.error('Whisper error:', err);
+                aiStatus.textContent = 'Voice transcription failed.';
+            }
+        };
+
+        // Setup Audio Analyser for Silence Detection
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        microphoneSource = audioContext.createMediaStreamSource(micStream);
+        microphoneSource.connect(analyser);
+
+    } catch (err) {
+        console.error("Mic setup failed:", err);
+    }
+}
+
+function checkSilence() {
+    if (!isRecording || !analyser) return;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(dataArray);
+    
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i];
+    }
+    const average = sum / bufferLength;
+
+    if (average < silenceThreshold) {
+        if (!silenceStart) silenceStart = Date.now();
+        else if (Date.now() - silenceStart > silenceDelay) {
+            stopListening(); // Silence exceeded 2 seconds -> Stop and Send
+        }
+    } else {
+        silenceStart = null; // User is speaking, reset silence timer
+    }
+}
+
+async function startListening() {
+    if (isRecording || answerInput.disabled) return;
+    if (synth.speaking) synth.cancel();
+    
+    if (!mediaRecorder) await setupAudioRecording();
+    if (!mediaRecorder) return;
+
+    audioChunks = [];
+    mediaRecorder.start();
+    isRecording = true;
+    silenceStart = null;
+    
+    answerInput.value = '';
+    answerInput.placeholder = '🎙 Listening to your voice...';
+    voiceBtn.classList.add('recording');
+    voiceBtn.innerHTML = '<i class="fa-solid fa-stop"></i> Stop';
+    aiStatus.textContent = '🎙 Listening...';
+    aiStatus.style.color = '#fd79a8';
+    
+    if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+    
+    checkSilenceInterval = setInterval(checkSilence, 100);
+}
+
+function stopListening() {
+    if (!isRecording) return;
+    isRecording = false;
+    if (checkSilenceInterval) clearInterval(checkSilenceInterval);
+    
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+    }
+    aiStatus.style.color = '';
+    aiStatus.textContent = 'Processing audio...';
+}
+
+voiceBtn.addEventListener('click', () => {
+    if (synth.speaking) synth.cancel();
+    if (isRecording) stopListening();
+    else startListening();
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script src="auth-guard.js"></script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Module | AI Virtual Interview</title>
+    <meta name="description" content="Train AI on YouTube topics, practice daily challenges, and get personalized learning suggestions.">
+    <link rel="stylesheet" href="home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ─── YouTube Trainer Section ─── */
+        .trainer-section {
+            margin-top: 60px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+        }
+        .trainer-grid {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        @media (max-width: 768px) {
+            .trainer-grid { flex-direction: column; }
+        }
+        .trainer-form { flex: 1; }
+        .trainer-form h2 {
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+        }
+        .trainer-form p { color: #888; margin-bottom: 25px; font-size: 14px; line-height: 1.6; }
+        .url-row { display: flex; gap: 12px; }
+        .url-input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+        }
+        .url-input:focus { outline: none; border-color: rgba(0,206,201,0.5); }
+        .url-input::placeholder { color: #555; }
+        .train-btn {
+            padding: 0 28px;
+            border-radius: 12px;
+            border: none;
+            background: #00cec9;
+            color: #111;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 48px;
+        }
+        .train-btn:hover { background: #01b4af; }
+        .train-btn:active { transform: scale(0.98); }
+        .train-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .status-msg {
+            margin-top: 14px;
+            font-size: 13px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-msg.show { display: flex; }
+        .status-msg.loading { background: rgba(253,203,110,0.1); color: #fdcb6e; }
+        .status-msg.success { background: rgba(0,206,201,0.1); color: #00cec9; }
+        .status-msg.error   { background: rgba(255,118,117,0.1); color: #ff7675; }
+
+        /* ─── Knowledge Library ─── */
+        .kb-panel {
+            flex: 1;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .kb-panel h4 { color: #fff; margin-bottom: 14px; font-size: 15px; }
+        .kb-scroll { max-height: 200px; overflow-y: auto; }
+        .kb-scroll::-webkit-scrollbar { width: 4px; }
+        .kb-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .kb-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .kb-table td { padding: 9px 6px; }
+        .kb-table tr { border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .kb-table tr:last-child { border-bottom: none; }
+        .kb-url { color: #aaa; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .kb-del-btn {
+            background: none;
+            border: none;
+            color: #ff7675;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .kb-del-btn:hover { background: rgba(255,118,117,0.1); }
+
+        /* ─── Daily Challenge Modal ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-card {
+            background: #14151a;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .modal-close {
+            position: absolute;
+            top: 18px; right: 18px;
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 22px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: #fff; }
+        .modal-icon {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 16px;
+        }
+        .modal-title { color: #fff; text-align: center; margin: 0; }
+        .modal-sub { color: #888; text-align: center; margin-top: 5px; font-size: 13px; }
+        .challenge-q-box {
+            background: rgba(255,255,255,0.02);
+            padding: 22px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin: 25px 0;
+        }
+        .challenge-q-box h4 {
+            color: #fff;
+            line-height: 1.6;
+            font-weight: 500;
+            font-size: 15px;
+            margin: 0;
+        }
+        .challenge-textarea {
+            width: 100%;
+            height: 110px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 14px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            margin-bottom: 18px;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+        .challenge-textarea:focus { outline: none; border-color: rgba(253,121,168,0.4); }
+        .challenge-submit-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: #fd79a8;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .challenge-submit-btn:hover { background: #ff80ab; }
+        .challenge-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-score { font-size: 52px; font-weight: 800; color: #fd79a8; text-align: center; margin-bottom: 10px; }
+        .result-feedback { color: #ccc; line-height: 1.6; text-align: center; margin-bottom: 28px; font-size: 14px; }
+        .close-result-btn {
+            display: block;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 11px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .close-result-btn:hover { background: rgba(255,255,255,0.12); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Interviewer</span>
+        </div>
+        <a href="home.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <main class="home-container">
+        <header class="home-header">
+            <h1>Training Module</h1>
+            <p>Hone your skills with specialized practice modes and targeted AI feedback.</p>
+        </header>
+
+        <div class="modules-grid">
+
+            <a href="interview.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(108, 92, 231, 0.2); color: #a29bfe;">
+                    <i class="fa-solid fa-person-chalkboard"></i>
+                </div>
+                <h3>Mock Practice</h3>
+                <p>Simulate realistic interview environments with continuous AI prompting.</p>
+                <span class="card-action">Start Practice <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="topic-practice.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(0, 206, 201, 0.2); color: #00cec9;">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <h3>Topic Practice</h3>
+                <p>Focus deeply on specific subjects like Data Structures or System Design.</p>
+                <span class="card-action">Select Topic <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="javascript:void(0)" class="module-card" onclick="openDailyChallenge()">
+                <div class="icon-wrapper" style="background: rgba(253, 121, 168, 0.2); color: #fd79a8;">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+                <h3>Daily Challenges</h3>
+                <p>Solve one micro-interview question a day to keep your mind sharp.</p>
+                <span class="card-action">View Challenge <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="ai-suggestions.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(253, 203, 110, 0.2); color: #fdcb6e;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h3>AI Suggestions</h3>
+                <p>Personalized learning paths and feedback based on your weaknesses.</p>
+                <span class="card-action">See Suggestions <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="communication.html" class="module-card">
+                <div class="icon-wrapper" style="background: rgba(178, 190, 195, 0.2); color: #dfe6e9;">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                </div>
+                <h3>Communication Training</h3>
+                <p>Improve your vocal delivery, eliminate filler words, and refine your tone.</p>
+                <span class="card-action">Train Communication <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+        </div>
+
+        <!-- YouTube AI Trainer + Knowledge Library -->
+        <section class="trainer-section">
+            <div class="trainer-grid">
+
+                <!-- Training Form -->
+                <div class="trainer-form">
+                    <h2>
+                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 28px;"></i>
+                        Train AI on Your Topics
+                    </h2>
+                    <p>Paste a YouTube tutorial URL below. Our AI will learn the content and use it to ask you targeted questions during Mock Practice.</p>
+
+                    <div class="url-row">
+                        <input type="url" id="youtube-url" class="url-input" placeholder="https://youtube.com/watch?v=...">
+                        <button id="train-btn" class="train-btn">
+                            <i class="fa-solid fa-bolt"></i> Train AI
+                        </button>
+                    </div>
+                    <div id="train-status" class="status-msg"></div>
+                </div>
+
+                <!-- Knowledge Library -->
+                <div class="kb-panel">
+                    <h4><i class="fa-solid fa-database" style="color: #00cec9; margin-right: 8px;"></i>My Knowledge Base</h4>
+                    <div class="kb-scroll">
+                        <table class="kb-table">
+                            <tbody id="knowledge-list">
+                                <tr><td style="padding: 18px; text-align: center; color: #555;">Loading your library...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Daily Challenge Modal -->
+    <div id="challenge-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeDailyChallenge()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="modal-icon" style="background: rgba(253, 121, 168, 0.1); color: #fd79a8;">
+                <i class="fa-solid fa-fire"></i>
+            </div>
+            <h2 class="modal-title">Daily Challenge</h2>
+            <p class="modal-sub">Question of the Day</p>
+
+            <!-- Challenge Q&A -->
+            <div id="challenge-content">
+                <div class="challenge-q-box">
+                    <h4 id="challenge-question">Loading today's challenge...</h4>
+                </div>
+                <textarea id="challenge-answer" class="challenge-textarea" placeholder="Type your answer here..."></textarea>
+                <button id="submit-challenge" class="challenge-submit-btn">Submit Answer</button>
+            </div>
+
+            <!-- Result view -->
+            <div id="challenge-result" style="display: none;">
+                <div class="result-score" id="challenge-score">0/10</div>
+                <div class="result-feedback" id="challenge-feedback">Great attempt!</div>
+                <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px; width: 100%;">
+                    <button class="close-result-btn" onclick="closeDailyChallenge()" style="margin: 0; flex: 1;">Close</button>
+                    <button class="close-result-btn" id="next-challenge-btn" style="margin: 0; flex: 1; background: #fd79a8; border-color: #fd79a8; color: #fff;">
+                        Try Another <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coming Soon Toast -->
+    <div id="toast" style="
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+        background: rgba(20,21,26,0.95); border: 1px solid rgba(255,255,255,0.08);
+        color: #fff; padding: 12px 24px; border-radius: 50px; font-size: 14px;
+        opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 9999;
+        backdrop-filter: blur(10px); box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    "></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="auth-guard.js"></script>
+    <script>
+    // ─── Config ───────────────────────────────────────────────
+    const BACKEND = 'http://localhost:8888';
+
+    // ─── Toast Notification ───────────────────────────────────
+    function showToast(msg, type = 'info') {
+        const t = document.getElementById('toast');
+        const colors = { info: '#00cec9', error: '#ff7675', success: '#00b894', warning: '#fdcb6e' };
+        t.textContent = msg;
+        t.style.borderColor = colors[type] || colors.info;
+        t.style.opacity = '1';
+        t.style.transform = 'translateX(-50%) translateY(0)';
+        clearTimeout(t._timeout);
+        t._timeout = setTimeout(() => {
+            t.style.opacity = '0';
+            t.style.transform = 'translateX(-50%) translateY(20px)';
+        }, 3500);
+    }
+
+    function showComingSoon(name) {
+        showToast(`⚡ ${name} is coming soon!`, 'info');
+    }
+
+    // ─── Status helper ────────────────────────────────────────
+    function setStatus(msg, type) {
+        const el = document.getElementById('train-status');
+        const icons = { loading: 'fa-spinner fa-spin', success: 'fa-circle-check', error: 'fa-circle-xmark' };
+        el.className = `status-msg show ${type}`;
+        el.innerHTML = `<i class="fa-solid ${icons[type]}"></i> ${msg}`;
+    }
+    function clearStatus() {
+        const el = document.getElementById('train-status');
+        el.className = 'status-msg';
+        el.innerHTML = '';
+    }
+
+    // ─── YouTube Training ─────────────────────────────────────
+    document.getElementById('train-btn').addEventListener('click', async () => {
+        const urlInput = document.getElementById('youtube-url');
+        const btn = document.getElementById('train-btn');
+        const url = urlInput.value.trim();
+
+        if (!url) { showToast('Please enter a YouTube URL', 'warning'); return; }
+
+        btn.disabled = true;
+        setStatus('AI is learning from this video… This may take up to 30 seconds.', 'loading');
+
+        try {
+            const res = await fetch(`${BACKEND}/api/train-youtube`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || 'Training failed');
+
+            setStatus(`✅ ${data.message}`, 'success');
+            urlInput.value = '';
+            loadKnowledgeLibrary();
+        } catch (err) {
+            setStatus(err.message, 'error');
+        } finally {
+            btn.disabled = false;
+        }
+    });
+
+    // ─── Knowledge Library ────────────────────────────────────
+    let kbRetryCount = 0;
+    async function loadKnowledgeLibrary() {
+        const tbody = document.getElementById('knowledge-list');
+        
+        // Wait for window.supabaseClient to initialize
+        if (!window.supabaseClient) {
+            if (kbRetryCount < 15) {
+                kbRetryCount++;
+                tbody.innerHTML = '<tr><td style="padding: 18px; text-align: center; color: #888;"><i class="fa-solid fa-spinner fa-spin"></i> Connecting to library...</td></tr>';
+                setTimeout(loadKnowledgeLibrary, 250);
+            } else {
+                tbody.innerHTML = '<tr><td style="padding: 18px; text-align: center; color: #ff7675;">Connection timed out. Please refresh.</td></tr>';
+            }
+            return;
+        }
+
+        try {
+            const sc = window.supabaseClient;
+            const { data, error } = await sc
+                .from('knowledge_base')
+                .select('video_url');
+
+            if (error) throw error;
+
+            // Deduplicate by video_url
+            const seen = new Set();
+            const unique = (data || []).filter(item => {
+                if (seen.has(item.video_url)) return false;
+                seen.add(item.video_url);
+                return true;
+            });
+
+            if (unique.length === 0) {
+                tbody.innerHTML = '<tr><td style="padding:18px; text-align:center; color:#555;">No custom topics trained yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = unique.map(item => {
+                const label = item.video_url.replace('https://www.youtube.com/watch?v=', 'yt/').replace('https://youtu.be/', 'yt/');
+                return `<tr>
+                    <td class="kb-url" title="${item.video_url}">${label}</td>
+                    <td style="text-align:right;">
+                        <button class="kb-del-btn" onclick="deleteKnowledge('${encodeURIComponent(item.video_url)}')">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        } catch (err) {
+            console.error("Load Knowledge Base Error:", err);
+            tbody.innerHTML = `<tr><td style="padding:18px; text-align:center; color:#ff7675;">Error: ${err.message || 'Could not load library.'}</td></tr>`;
+        }
+    }
+
+    async function deleteKnowledge(encodedUrl) {
+        if (!confirm('Remove this video from your knowledge base?')) return;
+        const url = decodeURIComponent(encodedUrl);
+        try {
+            const res = await fetch(`${BACKEND}/api/knowledge`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ video_url: url })
+            });
+            if (!res.ok) throw new Error('Delete failed');
+            showToast('Removed from knowledge base', 'success');
+            loadKnowledgeLibrary();
+        } catch (err) {
+            showToast('Could not delete: ' + err.message, 'error');
+        }
+    }
+
+    // ─── Daily Challenge ──────────────────────────────────────
+    const CHALLENGE_QUESTIONS = [
+        "Explain the concept of closures in JavaScript with a real-world example.",
+        "What is the difference between Virtual DOM and Shadow DOM?",
+        "How do you handle memory leaks in a React application?",
+        "Explain the 'this' keyword in different contexts in JavaScript.",
+        "What are the benefits of using TypeScript over plain JavaScript?",
+        "Describe the difference between REST and GraphQL APIs.",
+        "What is the event loop in JavaScript and how does it work?",
+        "Explain the SOLID principles with examples.",
+        "What is database indexing and when should you use it?",
+        "How would you design a simple rate limiter?",
+        "What are the key differences between SQL and NoSQL databases?",
+        "Explain the concept of responsive web design and how media queries work.",
+        "What is CSS Flexbox vs CSS Grid, and what are their primary use cases?",
+        "Explain the difference between synchronous and asynchronous tasks in Node.js.",
+        "What is a Promise in JavaScript and how do async/await simplify it?",
+        "What is the purpose of the virtual key attribute in React lists?",
+        "How does client-side caching (like LocalStorage or SessionStorage) differ from cookies?",
+        "Explain how CORS (Cross-Origin Resource Sharing) protects users and how to configure it.",
+        "What are web sockets and when would you use them over standard HTTP REST requests?",
+        "Explain the difference between GET, POST, PUT, and DELETE HTTP request methods."
+    ];
+
+    const completedChallenges = [];
+
+    window.openDailyChallenge = () => {
+        let q = "";
+
+        // First attempt today: consistent daily question
+        const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        const dailyQ = CHALLENGE_QUESTIONS[dayOfYear % CHALLENGE_QUESTIONS.length];
+
+        if (!completedChallenges.includes(dailyQ)) {
+            q = dailyQ;
+        } else {
+            // Find remaining questions we haven't served yet
+            const pool = CHALLENGE_QUESTIONS.filter(item => !completedChallenges.includes(item));
+            
+            if (pool.length > 0) {
+                // Pick a random unserved question
+                q = pool[Math.floor(Math.random() * pool.length)];
+            } else {
+                // All questions completed! Reset pool and pick random
+                completedChallenges.length = 0;
+                q = CHALLENGE_QUESTIONS[Math.floor(Math.random() * CHALLENGE_QUESTIONS.length)];
+            }
+        }
+
+        // Add to completed list so it is not repeated
+        completedChallenges.push(q);
+
+        document.getElementById('challenge-question').textContent = q;
+        document.getElementById('challenge-answer').value = '';
+        document.getElementById('challenge-content').style.display = 'block';
+        document.getElementById('challenge-result').style.display = 'none';
+        document.getElementById('submit-challenge').disabled = false;
+        document.getElementById('submit-challenge').textContent = 'Submit Answer';
+        document.getElementById('challenge-modal').classList.add('show');
+    };
+
+    window.closeDailyChallenge = () => {
+        document.getElementById('challenge-modal').classList.remove('show');
+    };
+
+    // Close on backdrop click
+    document.getElementById('challenge-modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeDailyChallenge();
+    });
+
+    // Wire up Next/Try Another Challenge Button
+    document.getElementById('next-challenge-btn').addEventListener('click', () => {
+        openDailyChallenge();
+    });
+
+    document.getElementById('submit-challenge').addEventListener('click', async () => {
+        const answer = document.getElementById('challenge-answer').value.trim();
+        if (!answer) { showToast('Please type an answer first!', 'warning'); return; }
+
+        const btn = document.getElementById('submit-challenge');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Evaluating...';
+
+        try {
+            const question = document.getElementById('challenge-question').textContent;
+            const res = await fetch(`${BACKEND}/api/evaluate-challenge`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question, answer })
+            });
+            const data = await res.json();
+
+            const displayScore = data.score ? `${data.score}/10` : '7/10';
+            const displayFeedback = data.feedback || 'Good effort! Continue to refine your terminology.';
+
+            document.getElementById('challenge-score').textContent = displayScore;
+            document.getElementById('challenge-feedback').textContent = displayFeedback;
+            document.getElementById('challenge-content').style.display = 'none';
+            document.getElementById('challenge-result').style.display = 'block';
+        } catch (err) {
+            showToast('Evaluation failed — is the backend running? (node server.js)', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Submit Answer';
+        }
+    });
+
+    // Load library after auth initializes (wait for supabaseClient)
+    setTimeout(loadKnowledgeLibrary, 800);
+    </script>
+</body>
+</html>
